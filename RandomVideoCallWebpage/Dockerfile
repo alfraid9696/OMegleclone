@@ -1,18 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY RandomVideoCallWebpage.csproj ./
-COPY Program.cs ./
-COPY appsettings*.json ./
-COPY Hubs/ Hubs/
-COPY Services/ Services/
-COPY Models/ Models/
-COPY Pages/ Pages/
-COPY Properties/ Properties/
-COPY wwwroot/ wwwroot/
-
+COPY . .
 RUN dotnet restore
-RUN dotnet publish RandomVideoCallWebpage.csproj -c Release -o /app/publish
+RUN dotnet publish -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
