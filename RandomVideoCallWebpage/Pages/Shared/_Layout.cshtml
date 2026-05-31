@@ -3,46 +3,107 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - RandomVideoCallWebpage</title>
+    <title>@ViewData["Title"] - Omegle Clone</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
     <link rel="stylesheet" href="~/RandomVideoCallWebpage.styles.css" asp-append-version="true" />
-
-    <link rel="stylesheet" href="~/css/chat.css" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var greetingName = User.Identity?.Name;
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        var currentUser = await UserManager.GetUserAsync(User);
+        if (!string.IsNullOrWhiteSpace(currentUser?.DisplayName))
+        {
+            greetingName = currentUser.DisplayName;
+        }
+    }
+}
+<body class="app-body">
+    <header class="app-header">
+        <nav class="navbar navbar-expand-md app-navbar">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">RandomVideoCallWebpage</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand app-brand" asp-area="" asp-page="/Index">
+                    <span class="app-brand-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556v4.35zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H2z" />
+                        </svg>
+                    </span>
+                    <span class="app-brand-text">
+                        <span class="app-brand-title">Omegle Clone</span>
+                        <span class="app-brand-tagline">Random video chat</span>
+                    </span>
+                </a>
+
+                <button class="navbar-toggler app-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNav"
+                        aria-controls="mainNav"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav ms-auto align-items-md-center gap-md-1">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link app-nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")"
+                                   asp-area="" asp-page="/Index">
+                                    Chat
+                                </a>
+                            </li>
+                            <li class="nav-item d-none d-md-block">
+                                <span class="app-user-name">Hello, @greetingName</span>
+                            </li>
+                            <li class="nav-item">
+                                <form method="post" asp-page="/Account/Logout" class="d-inline">
+                                    <button type="submit" class="btn btn-sm app-btn-outline">Logout</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link app-nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Account/Login" ? "active" : "")"
+                                   asp-area="" asp-page="/Account/Login">
+                                    Login
+                                </a>
+                            </li>
+                            <li class="nav-item ms-md-2">
+                                <a class="btn btn-sm app-btn-start" asp-area="" asp-page="/Account/Register">
+                                    Register
+                                </a>
+                            </li>
+                        }
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link app-nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/Privacy" ? "active" : "")"
+                               asp-area="" asp-page="/Privacy">
+                                Privacy
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container app-main">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - RandomVideoCallWebpage - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <footer class="app-footer">
+        <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+            <span>&copy; 2026 Omegle Clone</span>
+            <a asp-area="" asp-page="/Privacy" class="app-footer-link">Privacy policy</a>
         </div>
     </footer>
 

@@ -11,7 +11,9 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
+ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:10000
+RUN mkdir -p /app/data
 EXPOSE 10000
 
 ENTRYPOINT ["dotnet", "RandomVideoCallWebpage.dll"]

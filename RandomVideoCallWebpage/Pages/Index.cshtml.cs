@@ -1,13 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace RandomVideoCallWebpage.Pages
-{
-    public class IndexModel : PageModel
-    {
-        public void OnGet()
-        {
+namespace RandomVideoCallWebpage.Pages;
 
-        }
+[Authorize]
+public class IndexModel : PageModel
+{
+    public void OnGet()
+    {
     }
 }
