@@ -1,0 +1,15 @@
+.video-box {
+    width: 100%;
+    height: 350px;
+    background: black;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.message-area {
+    height: 250px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow-y: auto;
+    padding: 10px;
+}
