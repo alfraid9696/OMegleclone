@@ -1,4 +1,4 @@
-Visit the link using this link https://omegleclone-xunt.onrender.com
+Visit the application using this link https://omegleclone-xunt.onrender.com
 
 A random video chat web app where registered users are matched with strangers for live video calls and text chat.
 
