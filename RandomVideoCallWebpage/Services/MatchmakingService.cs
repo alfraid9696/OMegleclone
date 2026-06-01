@@ -11,6 +11,11 @@ public class MatchmakingService
     {
         lock (_waitingUsers)
         {
+            if (_activeChats.ContainsKey(connectionId))
+            {
+                return null;
+            }
+
             RemoveFromWaitingQueue(connectionId);
 
             if (_waitingUsers.Count > 0)
@@ -35,6 +40,14 @@ public class MatchmakingService
             : null;
     }
 
+    public int GetWaitingCount()
+    {
+        lock (_waitingUsers)
+        {
+            return _waitingUsers.Count;
+        }
+    }
+
     public void EndChat(string connectionId)
     {
         lock (_waitingUsers)
@@ -45,6 +58,20 @@ public class MatchmakingService
             {
                 _activeChats.TryRemove(partner, out _);
             }
+        }
+    }
+
+    public void EnqueueUser(string connectionId)
+    {
+        lock (_waitingUsers)
+        {
+            if (_activeChats.ContainsKey(connectionId))
+            {
+                return;
+            }
+
+            RemoveFromWaitingQueue(connectionId);
+            _waitingUsers.Enqueue(connectionId);
         }
     }
 

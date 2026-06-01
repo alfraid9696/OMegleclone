@@ -1,0 +1,49 @@
+@page
+@model RandomVideoCallWebpage.Pages.ProfileModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="profile-page">
+    <div class="profile-card">
+        <h1 class="profile-title">Profile</h1>
+        <p class="profile-subtitle">Your account details</p>
+
+        <dl class="profile-list">
+            <div class="profile-row">
+                <dt>Name</dt>
+                <dd>@Model.DisplayName</dd>
+            </div>
+            <div class="profile-row">
+                <dt>Email</dt>
+                <dd>@Model.Email</dd>
+            </div>
+            <div class="profile-row">
+                <dt>Age</dt>
+                <dd>@Model.Age</dd>
+            </div>
+            <div class="profile-row">
+                <dt>Gender</dt>
+                <dd>@Model.Gender</dd>
+            </div>
+            <div class="profile-row">
+                <dt>Country</dt>
+                <dd><span id="profileFlag" class="flag"></span> @Model.Country</dd>
+            </div>
+        </dl>
+
+        <a asp-page="/Index" class="btn btn-primary">Back to chat</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("profileFlag").textContent =
+            countryFlag("@Model.CountryCode");
+        function countryFlag(code) {
+            if (!code || code === "XX" || code.length !== 2) return "🌐";
+            return code.toUpperCase().replace(/./g, (c) =>
+                String.fromCodePoint(127397 + c.charCodeAt(0)));
+        }
+    </script>
+}

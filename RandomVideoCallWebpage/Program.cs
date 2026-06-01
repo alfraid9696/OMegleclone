@@ -47,6 +47,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<MatchmakingService>();
+builder.Services.AddSingleton<OnlinePresenceService>();
 
 var app = builder.Build();
 

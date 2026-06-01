@@ -5,59 +5,58 @@
 }
 
 <div class="auth-page">
-    <div class="auth-card">
+    <div class="auth-card auth-card-wide">
         <div class="auth-card-header">
             <h1>Create account</h1>
-            <p>Join Omegle Clone and start meeting new people.</p>
+            <p>Fill in your details to start chatting.</p>
         </div>
 
         <form method="post" class="auth-form" novalidate>
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <label asp-for="Input.Name" class="form-label"></label>
-                    <input asp-for="Input.Name" class="form-control" placeholder="Your name" />
-                    <span asp-validation-for="Input.Name" class="text-danger"></span>
+                    <input asp-for="Input.Name" class="form-control" />
+                    <span asp-validation-for="Input.Name" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <label asp-for="Input.Email" class="form-label"></label>
-                    <input asp-for="Input.Email" class="form-control" placeholder="you@example.com" />
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-4">
                     <label asp-for="Input.Age" class="form-label"></label>
                     <input asp-for="Input.Age" class="form-control" type="number" min="18" max="120" />
-                    <span asp-validation-for="Input.Age" class="text-danger"></span>
+                    <span asp-validation-for="Input.Age" class="text-danger small"></span>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-4">
                     <label asp-for="Input.Gender" class="form-label"></label>
                     <select asp-for="Input.Gender" asp-items="Model.GenderOptions" class="form-select"></select>
-                    <span asp-validation-for="Input.Gender" class="text-danger"></span>
+                    <span asp-validation-for="Input.Gender" class="text-danger small"></span>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-4">
                     <label asp-for="Input.Country" class="form-label"></label>
                     <select asp-for="Input.Country" asp-items="Model.CountryOptions" class="form-select"></select>
-                    <span asp-validation-for="Input.Country" class="text-danger"></span>
+                    <span asp-validation-for="Input.Country" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <label asp-for="Input.Password" class="form-label"></label>
-                    <input asp-for="Input.Password" class="form-control" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <label asp-for="Input.ConfirmPassword" class="form-label"></label>
-                    <input asp-for="Input.ConfirmPassword" class="form-control" />
-                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
                 </div>
             </div>
 
-            <button type="submit" class="btn auth-btn-primary w-100 mt-4">Create account</button>
+            <button type="submit" class="btn auth-btn-primary mt-4">Create account</button>
         </form>
 
-        <p class="auth-switch mt-4 mb-0">
-            Already have an account?
-            <a asp-page="/Account/Login">Log in</a>
+        <p class="auth-switch">
+            Already registered? <a asp-page="/Account/Login">Sign in</a>
         </p>
     </div>
 </div>
