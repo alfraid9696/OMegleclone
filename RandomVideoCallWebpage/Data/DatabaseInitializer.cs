@@ -6,40 +6,76 @@ public static class DatabaseInitializer
 {
     public static void ApplyMigrations(ApplicationDbContext db, bool isSqlite)
     {
-        try
+        if (isSqlite)
         {
-            db.Database.Migrate();
-        }
-        catch (Exception)
-        {
-            if (!isSqlite)
-            {
-                throw;
-            }
+            ApplySqlite(db);
+            return;
         }
 
-        EnsureBlockedColumnExists(db, isSqlite);
+        db.Database.Migrate();
     }
 
-    private static void EnsureBlockedColumnExists(ApplicationDbContext db, bool isSqlite)
+    private static void ApplySqlite(ApplicationDbContext db)
+    {
+        if (!TableExists(db, "AspNetUsers"))
+        {
+            // SQL Server migrations use nvarchar and cannot run on SQLite.
+            // Reset any partial schema from a failed Migrate() attempt, then create from the model.
+            if (TableExists(db, "__EFMigrationsHistory") || TableExists(db, "AspNetRoles"))
+            {
+                db.Database.EnsureDeleted();
+            }
+
+            db.Database.EnsureCreated();
+            return;
+        }
+
+        EnsureSqliteBlockedColumn(db);
+    }
+
+    private static bool TableExists(ApplicationDbContext db, string tableName)
     {
         if (!db.Database.CanConnect())
+        {
+            return false;
+        }
+
+        var connection = db.Database.GetDbConnection();
+        var shouldClose = connection.State != System.Data.ConnectionState.Open;
+
+        if (shouldClose)
+        {
+            connection.Open();
+        }
+
+        try
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText =
+                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = $name";
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = "$name";
+            parameter.Value = tableName;
+            command.Parameters.Add(parameter);
+
+            return Convert.ToInt32(command.ExecuteScalar()) > 0;
+        }
+        finally
+        {
+            if (shouldClose)
+            {
+                connection.Close();
+            }
+        }
+    }
+
+    private static void EnsureSqliteBlockedColumn(ApplicationDbContext db)
+    {
+        if (!TableExists(db, "AspNetUsers"))
         {
             return;
         }
 
-        if (isSqlite)
-        {
-            EnsureSqliteColumn(db);
-        }
-        else
-        {
-            EnsureSqlServerColumn(db);
-        }
-    }
-
-    private static void EnsureSqliteColumn(ApplicationDbContext db)
-    {
         var connection = db.Database.GetDbConnection();
         var shouldClose = connection.State != System.Data.ConnectionState.Open;
 
@@ -70,15 +106,5 @@ public static class DatabaseInitializer
                 connection.Close();
             }
         }
-    }
-
-    private static void EnsureSqlServerColumn(ApplicationDbContext db)
-    {
-        db.Database.ExecuteSqlRaw("""
-            IF COL_LENGTH('AspNetUsers', 'IsBlocked') IS NULL
-            BEGIN
-                ALTER TABLE AspNetUsers ADD IsBlocked bit NOT NULL CONSTRAINT DF_AspNetUsers_IsBlocked DEFAULT 0;
-            END
-            """);
     }
 }
