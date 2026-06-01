@@ -64,6 +64,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<MatchmakingService>();
 builder.Services.AddSingleton<OnlinePresenceService>();
+builder.Services.AddSingleton<FriendCallSessionService>();
+builder.Services.AddScoped<FriendService>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -99,5 +101,6 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapHub<ChatHub>("/chatHub");
+app.MapHub<FriendHub>("/friendHub");
 
 app.Run();

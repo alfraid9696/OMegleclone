@@ -127,6 +127,67 @@
     display: none !important;
 }
 
+.camera-off-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111827;
+    color: #e5e7eb;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.camera-off-overlay[hidden] {
+    display: none !important;
+}
+
+.media-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.media-controls[hidden] {
+    display: none !important;
+}
+
+.media-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.media-btn:hover {
+    background: var(--color-surface);
+    border-color: var(--color-text-muted);
+}
+
+.media-btn.is-off {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+.media-select {
+    flex: 1 1 100%;
+    min-width: 0;
+    font-size: 0.8125rem;
+    border-radius: var(--radius);
+}
+
 .chat-panel {
     background: var(--color-surface);
     border: 1px solid var(--color-border);

@@ -5,7 +5,11 @@
 }
 
 <div id="chatPage"
-    
+     class="chat-shell"
+     data-user-name="@Model.UserDisplayName"
+     data-user-country="@Model.UserCountry"
+     data-country-code="@Model.UserCountryCode"
+     data-user-id="@Model.CurrentUserId">
 
     <div class="chat-toolbar">
         <div class="toolbar-left">
@@ -13,6 +17,10 @@
             <span class="online-text"><span id="liveCount">0</span> online</span>
         </div>
         <div class="toolbar-actions">
+            <button id="openFriendsBtn" type="button" class="btn btn-outline-primary">
+                Friends <span id="navFriendBadge" class="friends-badge" hidden>0</span>
+            </button>
+            <button id="addFriendBtn" type="button" class="btn btn-outline-primary" hidden>Add friend</button>
             <button id="startBtn" type="button" class="btn btn-primary">Start</button>
             <button id="nextBtn" type="button" class="btn btn-outline-secondary" disabled>Next</button>
         </div>
@@ -45,7 +53,22 @@
             </div>
             <div class="video-frame-wrap">
                 <video id="localVideo" autoplay muted playsinline class="video-frame"></video>
+                <div id="cameraOffOverlay" class="camera-off-overlay" hidden>
+                    <span>Camera off</span>
+                </div>
                 <span id="localPing" class="ping-badge" hidden></span>
+            </div>
+            <div id="mediaControls" class="media-controls" hidden>
+                <button type="button" id="toggleMicBtn" class="media-btn" title="Mute microphone" aria-pressed="false">
+                    <span class="media-btn-label">Mic on</span>
+                </button>
+                <button type="button" id="toggleCameraBtn" class="media-btn" title="Turn camera off" aria-pressed="false">
+                    <span class="media-btn-label">Camera on</span>
+                </button>
+                <button type="button" id="switchCameraBtn" class="media-btn" title="Switch camera" hidden>
+                    <span class="media-btn-label">Switch cam</span>
+                </button>
+                <select id="cameraSelect" class="media-select form-select form-select-sm" hidden aria-label="Select camera"></select>
             </div>
         </section>
     </div>
@@ -59,9 +82,51 @@
     </section>
 </div>
 
+<div id="friendsBackdrop" class="friends-backdrop" hidden></div>
+<aside id="friendsPanel" class="friends-panel" hidden>
+    <div class="friends-panel-head">
+        <h2>Friends</h2>
+        <button type="button" id="closeFriendsBtn" class="btn btn-sm btn-outline-secondary">Close</button>
+    </div>
+    <div class="friends-tabs">
+        <button type="button" class="friends-tab active" data-tab="friends">Friends</button>
+        <button type="button" class="friends-tab" data-tab="requests">
+            Requests <span id="friendRequestBadge" class="friends-badge" hidden>0</span>
+        </button>
+    </div>
+    <div id="friendsTabContent" class="friends-tab-content"></div>
+    <div id="friendChatView" class="friend-chat-view" hidden>
+        <div class="friend-chat-head">
+            <button type="button" id="backToFriendsBtn" class="btn btn-sm btn-link">← Back</button>
+            <strong id="friendChatTitle">Friend</strong>
+            <span id="friendChatOnline" class="friends-online-pill" hidden>Online</span>
+        </div>
+        <div id="friendChatMessages" class="friend-chat-messages"></div>
+        <div class="friend-chat-actions">
+            <button type="button" id="friendCallBtn" class="btn btn-sm btn-primary">Call</button>
+        </div>
+        <div class="friend-chat-input-row">
+            <input id="friendChatInput" type="text" class="form-control" placeholder="Message friend..." />
+            <button type="button" id="friendChatSendBtn" class="btn btn-primary btn-sm">Send</button>
+        </div>
+    </div>
+</aside>
+
+<div id="incomingCallModal" class="incoming-call-modal" hidden>
+    <div class="incoming-call-card">
+        <p class="incoming-call-label">Incoming friend call</p>
+        <h3 id="incomingCallerName">Friend</h3>
+        <div class="incoming-call-actions">
+            <button type="button" id="acceptCallBtn" class="btn btn-success">Accept</button>
+            <button type="button" id="declineCallBtn" class="btn btn-outline-danger">Decline</button>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
     <script src="~/js/chat.js" asp-append-version="true"></script>
+    <script src="~/js/friends.js" asp-append-version="true"></script>
     <script>
         document.getElementById("localFlag").textContent =
             countryFlag("@Model.UserCountryCode");

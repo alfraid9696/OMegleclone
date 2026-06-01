@@ -31,6 +31,61 @@ public static class DatabaseInitializer
         }
 
         EnsureSqliteBlockedColumn(db);
+        EnsureFriendTables(db);
+    }
+
+    private static void EnsureFriendTables(ApplicationDbContext db)
+    {
+        if (TableExists(db, "Friendships"))
+        {
+            return;
+        }
+
+        var provider = db.Database.ProviderName ?? "";
+        if (provider.Contains("Sqlite", StringComparison.OrdinalIgnoreCase))
+        {
+            db.Database.ExecuteSqlRaw("""
+                CREATE TABLE IF NOT EXISTS FriendRequests (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    FromUserId TEXT NOT NULL,
+                    ToUserId TEXT NOT NULL,
+                    Status INTEGER NOT NULL,
+                    CreatedAtUtc TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS Friendships (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    UserAId TEXT NOT NULL,
+                    UserBId TEXT NOT NULL,
+                    CreatedAtUtc TEXT NOT NULL
+                );
+                CREATE UNIQUE INDEX IF NOT EXISTS IX_Friendships_UserAId_UserBId ON Friendships (UserAId, UserBId);
+                CREATE TABLE IF NOT EXISTS FriendMessages (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    SenderId TEXT NOT NULL,
+                    ReceiverId TEXT NOT NULL,
+                    Body TEXT NOT NULL,
+                    SentAtUtc TEXT NOT NULL,
+                    ReadAtUtc TEXT NULL
+                );
+                CREATE TABLE IF NOT EXISTS FriendCalls (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CallerId TEXT NOT NULL,
+                    ReceiverId TEXT NOT NULL,
+                    Status INTEGER NOT NULL,
+                    CreatedAtUtc TEXT NOT NULL
+                );
+                """);
+            return;
+        }
+
+        try
+        {
+            db.Database.Migrate();
+        }
+        catch
+        {
+            db.Database.EnsureCreated();
+        }
     }
 
     private static bool TableExists(ApplicationDbContext db, string tableName)

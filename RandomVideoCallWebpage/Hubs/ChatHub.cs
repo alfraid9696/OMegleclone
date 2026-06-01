@@ -276,6 +276,7 @@ public class ChatHub : Hub
 
     private static object CreatePartnerPayload(UserPresence profile) => new
     {
+        userId = profile.UserId,
         name = profile.DisplayName,
         country = profile.Country,
         countryCode = profile.CountryCode

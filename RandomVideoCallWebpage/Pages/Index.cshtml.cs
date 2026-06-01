@@ -33,6 +33,8 @@ public class IndexModel : PageModel
 
     public string UserCountryCode { get; private set; } = "XX";
 
+    public string CurrentUserId { get; private set; } = string.Empty;
+
     public async Task<IActionResult> OnGetAsync()
     {
         var user = await _userManager.GetUserAsync(User);
@@ -45,6 +47,7 @@ public class IndexModel : PageModel
 
         if (user != null)
         {
+            CurrentUserId = user.Id;
             UserDisplayName = user.DisplayName;
             UserEmail = user.Email ?? string.Empty;
             UserAge = user.Age;
