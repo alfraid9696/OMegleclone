@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-Visit the application using this link https://omegleclone-xunt.onrender.com
-=======
-# Strangers Call
->>>>>>> 5df2791 (added new features and auth system)
+
 
 A random video chat web app where registered users are matched with strangers for live video calls and text chat.
 
