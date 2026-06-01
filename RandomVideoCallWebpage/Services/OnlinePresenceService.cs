@@ -17,4 +17,22 @@ public class OnlinePresenceService
 
     public UserPresence? GetPresence(string connectionId) =>
         _connections.TryGetValue(connectionId, out var presence) ? presence : null;
+
+    public IReadOnlyList<UserPresence> GetAllOnline() =>
+        _connections.Values.ToList();
+
+    public IReadOnlyList<string> UnregisterByUserId(string userId)
+    {
+        var connectionIds = _connections
+            .Where(entry => entry.Value.UserId == userId)
+            .Select(entry => entry.Key)
+            .ToList();
+
+        foreach (var connectionId in connectionIds)
+        {
+            _connections.TryRemove(connectionId, out _);
+        }
+
+        return connectionIds;
+    }
 }

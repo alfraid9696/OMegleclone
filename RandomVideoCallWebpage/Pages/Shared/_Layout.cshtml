@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="~/RandomVideoCallWebpage.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
 @inject UserManager<ApplicationUser> UserManager
 @{
@@ -58,6 +59,9 @@
                             </li>
                             <li class="nav-item ms-md-2">
                                 <a class="btn btn-sm app-btn-primary" asp-page="/Account/Register">Register</a>
+                            </li>
+                            <li class="nav-item ms-md-2">
+                                <a class="nav-link app-nav-link" asp-page="/Admin/Login">Admin login</a>
                             </li>
                         }
                     </ul>

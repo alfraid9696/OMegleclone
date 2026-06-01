@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RandomVideoCallWebpage.Data;
@@ -44,18 +46,33 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
+builder.Services.Configure<AdminOptions>(builder.Configuration.GetSection(AdminOptions.SectionName));
+builder.Services.AddSingleton<AdminAuthService>();
+
+builder.Services.AddAuthentication()
+    .AddCookie(AdminAuthConstants.Scheme, options =>
+    {
+        options.LoginPath = "/Admin/Login";
+        options.AccessDeniedPath = "/Admin/Login";
+        options.Cookie.Name = "StrangersCall.Admin";
+        options.Cookie.HttpOnly = true;
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<MatchmakingService>();
 builder.Services.AddSingleton<OnlinePresenceService>();
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    if (databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
+    var isSqlite = databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase);
+
+    if (isSqlite)
     {
         var sqlitePath = connectionString
             .Replace("Data Source=", "", StringComparison.OrdinalIgnoreCase)
@@ -65,13 +82,9 @@ using (var scope = app.Services.CreateScope())
         {
             Directory.CreateDirectory(sqliteDir);
         }
+    }
 
-        db.Database.EnsureCreated();
-    }
-    else
-    {
-        db.Database.Migrate();
-    }
+    DatabaseInitializer.ApplyMigrations(db, isSqlite);
 }
 
 if (!app.Environment.IsDevelopment())

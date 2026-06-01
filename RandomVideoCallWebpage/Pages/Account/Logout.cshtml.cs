@@ -14,6 +14,18 @@ public class LogoutModel : PageModel
         _signInManager = signInManager;
     }
 
+    public async Task<IActionResult> OnGetAsync(bool? blocked)
+    {
+        await _signInManager.SignOutAsync();
+
+        if (blocked == true)
+        {
+            return RedirectToPage("/Account/Login", new { blocked = true });
+        }
+
+        return RedirectToPage("/Account/Login");
+    }
+
     public async Task<IActionResult> OnPostAsync()
     {
         await _signInManager.SignOutAsync();

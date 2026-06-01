@@ -1,0 +1,151 @@
+@page
+@model RandomVideoCallWebpage.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="admin-shell">
+    <div class="admin-header">
+        <div>
+            <h1>Admin dashboard</h1>
+            <p class="admin-subtitle">Refreshes every 5 seconds · @Model.LastUpdated.ToString("HH:mm:ss") UTC</p>
+        </div>
+        <form method="post" asp-page="/Admin/Logout">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Sign out</button>
+        </form>
+    </div>
+
+    <div class="admin-stats">
+        <div class="admin-stat-card">
+            <span class="admin-stat-label">Online now</span>
+            <strong class="admin-stat-value">@Model.OnlineCount</strong>
+        </div>
+        <div class="admin-stat-card">
+            <span class="admin-stat-label">Registered users</span>
+            <strong class="admin-stat-value">@Model.TotalRegisteredUsers</strong>
+        </div>
+        <div class="admin-stat-card">
+            <span class="admin-stat-label">Blocked users</span>
+            <strong class="admin-stat-value">@Model.BlockedUserCount</strong>
+        </div>
+        <div class="admin-stat-card">
+            <span class="admin-stat-label">Waiting for match</span>
+            <strong class="admin-stat-value">@Model.WaitingCount</strong>
+        </div>
+        <div class="admin-stat-card">
+            <span class="admin-stat-label">Active video chats</span>
+            <strong class="admin-stat-value">@Model.ActiveChatPairs</strong>
+        </div>
+    </div>
+
+    <div class="admin-grid">
+        <section class="admin-panel">
+            <h2>People online now (@Model.OnlineUsers.Count)</h2>
+            @if (Model.OnlineUsers.Count == 0)
+            {
+                <p class="admin-empty">Nobody is connected right now.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm admin-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Country</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.OnlineUsers)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="admin-online-dot" title="Online"></span>
+                                        @user.DisplayName
+                                    </td>
+                                    <td>@user.Country</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+
+        <section class="admin-panel">
+            <h2>All registered users (@Model.RegisteredUsers.Count)</h2>
+            @if (Model.RegisteredUsers.Count == 0)
+            {
+                <p class="admin-empty">No one has registered yet.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm admin-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Country</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.RegisteredUsers)
+                            {
+                                <tr class="@(user.IsBlocked ? "admin-row-blocked" : user.IsOnline ? "admin-row-online" : "")">
+                                    <td>@user.DisplayName</td>
+                                    <td>@user.Email</td>
+                                    <td>@user.Age</td>
+                                    <td>@user.Gender</td>
+                                    <td>@user.Country</td>
+                                    <td>
+                                        @if (user.IsBlocked)
+                                        {
+                                            <span class="admin-badge admin-badge-blocked">Blocked</span>
+                                        }
+                                        else if (user.IsOnline)
+                                        {
+                                            <span class="admin-badge admin-badge-online">Online</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="admin-badge admin-badge-offline">Offline</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (user.IsBlocked)
+                                        {
+                                            <form method="post" asp-page-handler="Unblock" class="d-inline">
+                                                <input type="hidden" name="userId" value="@user.Id" />
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-success">Unblock</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form method="post" asp-page-handler="Block" class="d-inline">
+                                                <input type="hidden" name="userId" value="@user.Id" />
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Block @user.DisplayName? They will be disconnected immediately.');">
+                                                    Block
+                                                </button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+<meta http-equiv="refresh" content="5" />

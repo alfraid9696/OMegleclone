@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RandomVideoCallWebpage.Models;
 using RandomVideoCallWebpage.Services;
@@ -10,10 +11,14 @@ namespace RandomVideoCallWebpage.Pages;
 public class IndexModel : PageModel
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
-    public IndexModel(UserManager<ApplicationUser> userManager)
+    public IndexModel(
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public string UserDisplayName { get; private set; } = string.Empty;
@@ -28,9 +33,15 @@ public class IndexModel : PageModel
 
     public string UserCountryCode { get; private set; } = "XX";
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
         var user = await _userManager.GetUserAsync(User);
+
+        if (user?.IsBlocked == true)
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToPage("/Account/Login", new { blocked = true });
+        }
 
         if (user != null)
         {
@@ -41,5 +52,7 @@ public class IndexModel : PageModel
             UserCountry = user.Country;
             UserCountryCode = CountryCodes.GetCode(user.Country);
         }
+
+        return Page();
     }
 }

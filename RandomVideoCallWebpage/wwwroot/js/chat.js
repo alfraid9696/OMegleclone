@@ -55,6 +55,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function appendMessage(sender, text) {
+        if (!messages) {
+            return;
+        }
+
         const row = document.createElement("div");
         row.className = "message-row";
         row.textContent = `${sender}: ${text}`;
@@ -63,7 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function clearMessages() {
-        messages.innerHTML = "";
+        if (messages) {
+            messages.innerHTML = "";
+        }
     }
 
     function updatePartnerInfo(partner) {
@@ -276,6 +282,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     connection.on("LiveCountUpdated", (count) => setLiveCount(count));
+
+    connection.on("AccountBlocked", () => {
+        alert("Your account has been blocked.");
+        window.location.href = "/Account/Logout?blocked=1";
+    });
 
     connection.on("WaitingForPartner", () => {
         setStatus("Looking for someone to connect...");

@@ -1,22 +1,18 @@
 @page
-@model RandomVideoCallWebpage.Pages.Account.LoginModel
+@model RandomVideoCallWebpage.Pages.Admin.LoginModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Admin Login";
+    Layout = "_Layout";
 }
 
 <div class="auth-page">
     <div class="auth-card">
         <div class="auth-card-header">
-            <h1>Sign in</h1>
-            <p>Enter your account details to continue.</p>
+            <h1>Admin sign in</h1>
+            <p>Restricted area for site administrators.</p>
         </div>
 
         <form method="post" class="auth-form" novalidate>
-            <input type="hidden" asp-for="ReturnUrl" />
-            @if (!string.IsNullOrEmpty(Model.BlockedMessage))
-            {
-                <div class="alert alert-warning mb-3">@Model.BlockedMessage</div>
-            }
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
@@ -25,23 +21,14 @@
                 <span asp-validation-for="Input.Email" class="text-danger small"></span>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-4">
                 <label asp-for="Input.Password" class="form-label">Password</label>
                 <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
                 <span asp-validation-for="Input.Password" class="text-danger small"></span>
             </div>
 
-            <div class="form-check mb-4">
-                <input asp-for="Input.RememberMe" class="form-check-input" />
-                <label asp-for="Input.RememberMe" class="form-check-label"></label>
-            </div>
-
             <button type="submit" class="btn auth-btn-primary">Sign in</button>
         </form>
-
-        <p class="auth-switch">
-            No account? <a asp-page="/Account/Register">Register</a>
-        </p>
     </div>
 </div>
 

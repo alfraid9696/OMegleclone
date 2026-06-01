@@ -48,6 +48,11 @@ public class MatchmakingService
         }
     }
 
+    public int GetActiveChatPairCount()
+    {
+        return _activeChats.Count / 2;
+    }
+
     public void EndChat(string connectionId)
     {
         lock (_waitingUsers)

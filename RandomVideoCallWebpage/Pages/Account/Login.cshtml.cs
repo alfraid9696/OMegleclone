@@ -9,10 +9,14 @@ namespace RandomVideoCallWebpage.Pages.Account;
 public class LoginModel : PageModel
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public LoginModel(SignInManager<ApplicationUser> signInManager)
+    public LoginModel(
+        SignInManager<ApplicationUser> signInManager,
+        UserManager<ApplicationUser> userManager)
     {
         _signInManager = signInManager;
+        _userManager = userManager;
     }
 
     [BindProperty]
@@ -20,9 +24,16 @@ public class LoginModel : PageModel
 
     public string? ReturnUrl { get; set; }
 
-    public void OnGet(string? returnUrl = null)
+    public string? BlockedMessage { get; private set; }
+
+    public void OnGet(string? returnUrl = null, bool? blocked = null)
     {
         ReturnUrl = returnUrl ?? Url.Content("~/");
+
+        if (blocked == true)
+        {
+            BlockedMessage = "Your account has been blocked.";
+        }
     }
 
     public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
@@ -34,6 +45,13 @@ public class LoginModel : PageModel
             return Page();
         }
 
+        var user = await _userManager.FindByEmailAsync(Input.Email);
+        if (user?.IsBlocked == true)
+        {
+            ModelState.AddModelError(string.Empty, "Your account has been blocked. Contact support.");
+            return Page();
+        }
+
         var result = await _signInManager.PasswordSignInAsync(
             Input.Email,
             Input.Password,
@@ -42,6 +60,14 @@ public class LoginModel : PageModel
 
         if (result.Succeeded)
         {
+            var signedInUser = await _userManager.FindByEmailAsync(Input.Email);
+            if (signedInUser?.IsBlocked == true)
+            {
+                await _signInManager.SignOutAsync();
+                ModelState.AddModelError(string.Empty, "Your account has been blocked. Contact support.");
+                return Page();
+            }
+
             return LocalRedirect(ReturnUrl);
         }
 

@@ -29,6 +29,13 @@ public class ChatHub : Hub
 
         if (user != null)
         {
+            if (user.IsBlocked)
+            {
+                await Clients.Caller.SendAsync("AccountBlocked");
+                Context.Abort();
+                return;
+            }
+
             _presence.Register(new UserPresence
             {
                 ConnectionId = Context.ConnectionId,
@@ -45,6 +52,11 @@ public class ChatHub : Hub
 
     public async Task StartChat()
     {
+        if (await RejectIfBlockedAsync())
+        {
+            return;
+        }
+
         var connectionId = Context.ConnectionId;
 
         if (_matchmaking.GetPartner(connectionId) is string existingPartner)
@@ -69,6 +81,11 @@ public class ChatHub : Hub
 
     public async Task NextStranger()
     {
+        if (await RejectIfBlockedAsync())
+        {
+            return;
+        }
+
         var connectionId = Context.ConnectionId;
         var partner = _matchmaking.GetPartner(connectionId);
 
@@ -96,6 +113,11 @@ public class ChatHub : Hub
     public async Task<bool> SendMessage(string message)
     {
         if (string.IsNullOrWhiteSpace(message))
+        {
+            return false;
+        }
+
+        if (await RejectIfBlockedAsync())
         {
             return false;
         }
@@ -134,6 +156,11 @@ public class ChatHub : Hub
         string? sdpMid,
         int? sdpMLineIndex)
     {
+        if (await RejectIfBlockedAsync())
+        {
+            return;
+        }
+
         var partner = _matchmaking.GetPartner(Context.ConnectionId);
 
         if (partner != null)
@@ -182,8 +209,36 @@ public class ChatHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
+    private async Task<bool> RejectIfBlockedAsync()
+    {
+        var user = await _userManager.GetUserAsync(Context.User!);
+        if (user?.IsBlocked != true)
+        {
+            return false;
+        }
+
+        var connectionId = Context.ConnectionId;
+        var partner = _matchmaking.GetPartner(connectionId);
+        _matchmaking.RemoveUser(connectionId);
+        _presence.Unregister(connectionId);
+
+        if (partner != null)
+        {
+            await Clients.Client(partner).SendAsync("PartnerDisconnected");
+        }
+
+        await Clients.Caller.SendAsync("AccountBlocked");
+        Context.Abort();
+        return true;
+    }
+
     private async Task ForwardToPartnerAsync(string method, string payload)
     {
+        if (await RejectIfBlockedAsync())
+        {
+            return;
+        }
+
         var partner = _matchmaking.GetPartner(Context.ConnectionId);
 
         if (partner != null)
