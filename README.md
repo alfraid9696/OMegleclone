@@ -1,33 +1,19 @@
 # Strangers Call (Omegle Clone)
 
-A random video chat web app where registered users are matched with strangers for live video calls and text chat.
+A random video chat web app where users are matched with strangers for live video calls and chat.
 
-Visit: https://omegleclone-xunt.onrender.com
+Live: https://omegleclone-xunt.onrender.com
 
 ## Features
-
-- User registration and login
-- Random matchmaking queue
-- Peer-to-peer video and audio (WebRTC)
-- Real-time text chat (SignalR)
-- Online user count
-- Profile page (name, age, gender, country)
-- Skip to next person
+- User authentication
+- Random matchmaking
+- WebRTC video/audio
+- SignalR real-time chat
+- Online users
+- Skip next user
 
 ## Tech Stack
-
-- ASP.NET Core 8 (Razor Pages)
-- ASP.NET Identity
-- SignalR
-- WebRTC
-- Entity Framework Core (SQL Server / SQLite)
-- Bootstrap
-- Docker + Render
+ASP.NET Core 8, SignalR, WebRTC, EF Core, Bootstrap
 
 ## Run Locally
-
-**Requirements:** .NET 8 SDK, SQL Server LocalDB
-
-```bash
-cd RandomVideoCallWebpage
 dotnet run
